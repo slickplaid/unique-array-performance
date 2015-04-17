@@ -1,0 +1,259 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/dojo/1/dojo/dojo.xd.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+
+<script>
+
+var Suite = {
+	array1: ["Vijendra", "Singh", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+	array2: ["Singh", "Shakya", 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+	setup: {
+
+	},
+	tests: {},
+};
+
+Suite.setup.extendLoop = function(loopLength) {
+	if(!loopLength) {
+		loopLength = 100;
+	}
+
+	for(var loop = 0; loop < loopLength; loop++) {
+		var val1 = Math.floor(Math.random() * 100);
+		var val2 = Math.floor(Math.random() * 100);
+
+		Suite.array1.push(val1);
+		Suite.array2.push(val2);
+	};
+};
+
+/*
+ To make all tests equal, the array input into the function must accept both arrays
+ and do all manipulation from there. No accepting already concat/joined arrays.
+*/ 
+
+// Test #1
+// http://stackoverflow.com/a/1584377/259809
+Suite.tests.arrayUnique = function(array1, array2) {
+	var array = array1.concat(array2);
+	var a = array.concat();
+	for (var i = 0; i < a.length; ++i) {
+		for (var j = i + 1; j < a.length; ++j) {
+			if (a[i] === a[j]) {
+				a.splice(j--, 1);
+			}
+		}
+	}
+
+	return a;
+};
+
+// Test #2
+// http://stackoverflow.com/a/23080662/259809
+Suite.tests.filterArray = function(array1, array2) {
+	return array1.concat(array2.filter(function(i) {
+		return array1.indexOf(i) == -1;
+	}));
+};
+
+// Test #3
+// http://stackoverflow.com/a/25120770/259809
+Suite.tests.whileLoop = function(array1, array2) {
+	var array3 = [];
+	var arr = array1.concat(array2);
+	var len = arr.length;
+	var assoc = {};
+
+	while(len--) {
+		var itm = arr[len];
+
+		if(array3.indexOf(itm) === -1) {
+			array3.unshift(itm);
+		}
+	}
+
+	return array3;
+};
+
+// Test #4
+// http://stackoverflow.com/a/10499519/259809
+Suite.tests.lodashUnion = _.union;
+
+
+// Test #5
+// http://stackoverflow.com/a/25120770/259809
+Suite.tests.whileLoopAlt = function(array1, array2) {
+	var array3 = [];
+	var arr = array1.concat(array2);
+	var len = arr.length;
+	var assoc = {};
+
+	while(len--) {
+		var itm = arr[len];
+
+		if(!assoc[itm]) { // Eliminate the indexOf call
+			array3.unshift(itm);
+			assoc[itm] = true;
+		}
+	}
+
+	return array3;
+};
+
+// http://stackoverflow.com/a/7122370/259809
+Suite.tests.multipleArrayMerge = function() {
+	var result = [];
+    for(var i = 0; i < arguments.length; i++){
+        var array = arguments[i];
+        for(var j = 0; j < array.length; j++){
+            if(result.indexOf(array[j]) === -1) {
+                result.push(array[j]);
+            }
+        }
+    }
+    return result;
+};
+
+// Omitted: http://stackoverflow.com/a/1584398/259809
+// Does not satisfy taking two arrays and merging them
+// Insteads offers up using objects for removing dupes
+
+// http://stackoverflow.com/a/1584379/259809
+Suite.tests.alternateLoopSolution = function(array1, array2) {
+	var merged = array1.concat(array2);
+	var t;
+	// changed i = 0 to var i = 0 to keep i out of global scope
+	for(var i = 0; i < merged.length; i++) {
+		if((t = merged.indexOf(i + 1, merged[i])) != -1) {
+			merged.splice(t, 1);
+			i--;
+		}
+	}
+
+	return merged;
+};
+
+// http://stackoverflow.com/a/13847481/259809
+Suite.tests.mergeStringArrays = function(array1, array2) {
+	var hash = {};
+	var ret = [];
+
+	for(var i = 0; i < array1.length; i++) {
+		var e = array1[i];
+		if(!hash[e]) {
+			hash[e] = true;
+			ret.push(e);
+		}
+	}
+
+	for(var i = 0; i < array2.length; i++) {
+		var e = array2[i];
+		if(!hash[e]) {
+			hash[e] = true;
+			ret.push(e);
+		}
+	}
+
+	return ret;
+};
+
+// http://stackoverflow.com/a/17880337/259809
+Suite.tests.addPrototype = function(array1, array2) {
+	var a = array1.concat();
+	// incorrect, had to fix because array2 would have a length
+	if(array2.push || !array2.length) return a;
+	if(!a.length) return b.concat();
+
+	for(var i = 0; i < b.length; i++) {
+		if(a.indexOf(b[i]) == -1) {
+			a.push(b[i]);
+		}
+	}
+
+	return a;
+};
+
+// http://stackoverflow.com/a/26792988/259809
+Suite.tests.jQueryTest = function(array1, array2) {
+	$.unique(array1.concat(array2));
+};
+
+// http://stackoverflow.com/a/22541472/259809
+Suite.tests.flatMerge = function(array1, array2) {
+    return Array.prototype.reduce.call(arguments, function (result, current) {
+        if (!(current instanceof Array)) {
+            if (result.indexOf(current) === -1) {
+                result.push(current);
+            }
+        } else {
+            current.forEach(function (value) {
+                if (result.indexOf(value) === -1) {
+                    result.push(value);
+                }
+            });
+        }
+        return result;
+    }, []);
+};
+
+// http://stackoverflow.com/a/8000047/259809
+Suite.tests.dojosan = function(array1, array2) {
+	var unique = [];
+	var array3 = array1.concat(array2);
+
+	dojo.forEach(array3, function(item) {
+	    if (dojo.indexOf(unique, item) > -1) return;
+	    unique.push(item); 
+	});
+
+	return unique;
+};
+
+Suite.tests.greatMerge = function(array1, array2) {
+    var hash = {}, i;
+    for (i=0; i<array1.length; i++) {
+        hash[array1[i]]=true;
+    } 
+    for (i=0; i<array2.length; i++) {
+        hash[array2[i]]=true;
+    } 
+    return Object.keys(hash);
+};
+
+Suite.tests.whileLoopAlt2 = function(array1, array2) {
+	var array3 = array1.slice(0);
+	var len = array2.length;
+	var assoc = {};
+
+	while(len--) {
+		var itm = array2[len];
+
+		if(!assoc[itm]) { // Eliminate the indexOf call
+			array3.push(itm);
+			assoc[itm] = true;
+		}
+	}
+
+	return array3;
+};
+
+Suite.tests.order = [
+	Suite.tests.arrayUnique,
+	Suite.tests.filterArray,
+	Suite.tests.whileLoop,
+	Suite.tests.lodashUnion,
+	Suite.tests.multipleArrayMerge,
+	Suite.tests.alternateLoopSolution,
+	Suite.tests.mergeStringArrays,
+	Suite.tests.addPrototype,
+	Suite.tests.jQueryTest,
+	Suite.tests.flatMerge,
+	Suite.tests.dojosan,
+	Suite.tests.greatMerge,
+	Suite.tests.whileLoopAlt2
+];
+
+// Build up the array to tell true performance of a long iteration 
+Suite.setup.extendLoop();
+
+</script>
